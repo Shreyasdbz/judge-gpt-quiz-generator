@@ -19,6 +19,7 @@ class Article:
     - title: str - Title of the article
     - content: str - Content of the article
     - is_fake: bool - Flag indicating if the article is fake
+    - fake_details: str - Specific details about the article that make it fake
     - style_or_source: str - Style (if generated) or source (if real) of the article
     - origin_locale: str - Locale of the original article
     - headline_generation_model_used: str - Model used for headline generation
@@ -40,6 +41,7 @@ class Article:
     title: str = ""
     content: str = ""
     is_fake: bool = False
+    fake_details: str = ""
     style_or_source: str = ""
     origin_locale: str = ""
     headline_generation_model_used: str = ""

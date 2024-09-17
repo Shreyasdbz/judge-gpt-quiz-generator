@@ -48,7 +48,7 @@ def generate_single_article(
     make_fake = random.choice(make_fake_choices)
     
     # Generate article headline
-    headline, context = generate_headline_with_4o_mini(
+    headline, context, detail = generate_headline_with_4o_mini(
         news_outlet=style_to_use,
         locale=locale_to_use,
         make_fake=make_fake,
@@ -59,6 +59,7 @@ def generate_single_article(
     new_article.origin_locale = locale_to_use
     new_article.style_or_source = style_to_use
     new_article.is_fake = make_fake
+    new_article.fake_details = detail
     new_article.title = headline
     new_article.headline_context = context
     new_article.headline_generation_model_used = "GPT-4o-mini"
@@ -72,7 +73,8 @@ def generate_single_article(
         style=style_to_use,
         headline=headline,
         context=context,
-        is_fake=make_fake
+        is_fake=make_fake,
+        fake_detail=detail
     )
     new_article.content = content
     new_article.content_model_used = "GPT-4o"

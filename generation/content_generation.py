@@ -34,14 +34,14 @@ primary_prompt = '''
 # ---------------------------------------------------
 # Model: ChatGPT-4o
 # ---------------------------------------------------
-def generate_content_with_4o(origin_locale, style, headline, context, is_fake, fake_detail):
+def generate_content_with_4o(origin_locale, style, headline, detail, is_fake, fake_detail):
   """
   ### Generates article content using the GPT-4o model.
   #### Args:
   - origin_locale (str): The original locale of the article
   - style (str): The style to emulate of news outlets
   - headline (str): Generated headline
-  - context (str): Expanded context for the headline
+  - detail (str): Some detail for the headline
   - is_fake (bool): Flag indicating if the generated headline is fake
   - fake_detail (str): Detail about what makes the headline fake / real
   #### Returns:
@@ -57,11 +57,10 @@ def generate_content_with_4o(origin_locale, style, headline, context, is_fake, f
       f'''{primary_prompt}
       '''
       },
-      # Headline & context
+      # Headline
       {"role": "user", "content": f"The article you'll be writing about is headlined: {headline}."},
-      {"role": "user", "content": f"Here's the context for the article: {context}."},
-      # Detail about fake / real
-      {"role": "user", "content": f"What makes this content {'fake' if is_fake else 'real'} is: {fake_detail}"},
+      # Detail
+      {"role": "user", "content": f"What makes this content {'fake' if is_fake else 'real'} is this detail: {detail}"},
       # Real or fake
       {"role": "user", "content": f"Keep in mind that the story you're writing is {'fake' if is_fake else 'real'}"},
       # Style

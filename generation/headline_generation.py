@@ -30,7 +30,7 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
     - make_fake (bool): Flag indicating if the headline should be fake
     - used_prompts_list (list): List of prompts to avoid repeating
     #### Returns:
-    - headline, context, detail
+    - headline, detail
     """
 
     print("Generating headline with GPT-4o Mini model. For `{news_outlet}` in `{locale}` language. Is fake: `{make_fake}`")
@@ -87,19 +87,16 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
             {"role": "system", "content": 
                 '''
                     You are a journalist writing a news article's headline.
-                    Just the headline, some context and a line of detail used to generate it is needed.
+                    Just the headline, and a line of detail used to generate it is needed.
                     The headline should be 8-14 words long.
                     Don't include double quotes in the headline.
-                    Write the headline one 1 line and the context on the next line and the detail on the 3rd line.
-                    Don't include the headline in the context or detail.
-                    Don't say "headline" or "context" or "detail" in the response.
+                    Write the headline one 1 line and the detail on the next line.
+                    Don't repeat the headline in the detail.
+                    Don't say "headline" or "detail" in the response.
                     Avoid leaving trailing white spaces.
-                    Make the context 1-2 short sentences long.
                     Make the detail 1 short sentence. It should be a nuanced detail.
-                    Add some nuanced details to the context.
                     Make the topics relevant to the news outlet provided.
                     Pick topics that are usually attention-grabbing and try to avoid mundane ones.
-                    Make sure the headline, context and detail and are all included in the response.
                 '''
             },
             # Topics to use
@@ -114,32 +111,28 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
             {"role": "system", "content": f"Write the article in {locale_name} language. Add in some nuanced details."},
             # Avoid repeating prompts
             {"role": "system", "content": f"Don't repeat from these prompts: {used_prompts_list}"},
-            
+            # Additional prompt
+            {"role": "system", "content": 
+                '''
+                Avoid using slang or idiomatic expressions.
+                Make sure the headline and detail and are all included in the response (on separate lines).
+                '''
+            }            
         ]
     )
     
     content = response.choices[0].message.content
-    headline = ""
-    context = ""
-    detail = ""
-    # Try and extract the headline, context and detail from the response
-    try:
-        headline = content.split("\n")[0]
-        context = content.split("\n")[1]
-        detail = content.split("\n")[2]
-    except:
-        print(f"Failed to extract headline, context and detail from the response: {content}")
-        
-        print(f"""
-        -----------------------------------
-        ->>> Headline generation
-        - Headline: {headline}
-        - Context: {context}
-        - Detail: {detail}
-        -----------------------------------
-        """
-        )
+    headline = content.split("\n")[0]
+    detail = content.split("\n")[1]        
+    print(f"""
+    -----------------------------------
+    ->>> Headline generation
+    - Headline: {headline}
+    - Detail: {detail}
+    -----------------------------------
+    """
+    )
 
-    return headline, context, detail
+    return headline, detail
      
     

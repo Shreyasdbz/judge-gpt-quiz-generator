@@ -56,7 +56,9 @@ def main():
     - Add in a function call below to get started.
     ================================================================================
     """
-    )        
+    )  
+    
+    generate_and_push_to_db()      
     
 if __name__ == "__main__":
     main()

@@ -17,12 +17,11 @@ class Article:
     - uid: str - Unique identifier for the article
     - created_at: datetime - Date and time when the article was created
     - headline: str - headline of the article
+    - detail: str - Specific details about the article
     - content: str - Content of the article
     - is_fake: bool - Flag indicating if the article is fake
-    - details: str - Specific details about the article that make it fake
     - style_or_source: str - Style (if generated) or source (if real) of the article
     - origin_locale: str - Locale of the original article
-    - headline_context: str - Context for the headline that's generated which can be used to generate the content
     - headline_model_used: str - Model used for headline generation
     - content_model_used: str - Model used for content generation
     - translation_model_used: str - Model used for content translation
@@ -42,10 +41,9 @@ class Article:
     uid: str = field(default_factory=lambda: ''.join(random.choices(string.ascii_letters + string.digits, k=10)))
     created_at: datetime = field(default_factory=datetime.now)
     headline: str = ""
+    detail: str = ""
     content: str = ""
     is_fake: bool = False
-    headline_context: str = ""
-    details: str = ""
     style_or_source: str = ""
     origin_locale: str = ""
     headline_model_used: str = ""

@@ -22,7 +22,7 @@ def generate_single_article(
     ### Pipeline for generating a single article. Does not store the generated article.
     1. Picks a random locale to use from the passed in options as well as a corresponding
         news outlet style to emulate.
-    2. Uses GPT-4o-mini to generate a headline and a context in the locale.
+    2. Uses GPT-4o-mini to generate a headline and a detail in the locale.
     3. Picks a random content model to use for generating the article.
     4. Generated headline and content are then translated into the rest of the supported locales.
     
@@ -50,7 +50,7 @@ def generate_single_article(
     make_fake = random.choice(make_fake_choices)
     
     # Generate article headline
-    headline, context, detail = generate_headline_with_4o_mini(
+    headline, detail = generate_headline_with_4o_mini(
         news_outlet=style_to_use,
         locale=locale_to_use,
         make_fake=make_fake,
@@ -61,9 +61,8 @@ def generate_single_article(
     new_article.origin_locale = locale_to_use
     new_article.style_or_source = style_to_use
     new_article.is_fake = make_fake
-    new_article.fake_details = detail
+    new_article.detail = detail
     new_article.headline = headline
-    new_article.headline_context = context
     new_article.headline_model_used = "GPT-4o-mini"
     
     # Generate article content
@@ -72,7 +71,7 @@ def generate_single_article(
         origin_locale=locale_to_use,
         style=style_to_use,
         headline=headline,
-        context=context,
+        detail=detail,
         is_fake=make_fake,
         fake_detail=detail
     )

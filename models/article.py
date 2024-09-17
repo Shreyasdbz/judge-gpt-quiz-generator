@@ -4,7 +4,7 @@ import string
 from datetime import datetime
 from typing import Optional
 
-supported_locales = ['en']
+supported_locales = ['en', 'es', 'fr', 'de']
 
 # New outlets by locale
 news_outlets_en = [

@@ -8,7 +8,10 @@ respective LLMs. These include GPT-4, GPT-4o, Phi-3-medium-4k-instruct, Llama-2,
 Meta-Llama-3.1, Mistral-large, etc.
 '''
 
-from headline_generation import generate_multiple_headlines
+from models.article import supported_locales
+from generation.headline_generation import generate_multiple_headlines
+from generation.content_generation import generate_content_with_gpt_4o
+
 
 # def initialize():
 #     """ Initialize the application """
@@ -25,12 +28,25 @@ from headline_generation import generate_multiple_headlines
 def main():
     """ main """
     
-    generate_multiple_headlines(
-        generate_limit=10,
-        make_fake_choices=[True, False],
-        locales_to_use=['en', 'es', 'fr', 'de'],
-        generated_headlines_file_path="generated_headlines.json"
-    )    
+    generated_headlines_file_path = "data/generated_headlines.json"
+    
+    # Step 1: Headline generation
+    # generate_multiple_headlines(
+    #     generate_limit=10,
+    #     make_fake_choices=[True, False],
+    #     locales_to_use=supported_locales,
+    #     generated_headlines_file_path=generated_headlines_file_path
+    # )    
+    
+    # Step 2: Content generation
+    content_response = generate_content_with_gpt_4o(
+        origin_locale="en",
+        style="Financial Times",
+        headline="Major Economies Unite to Combat Cybersecurity Threats in Digital Age",
+        context="In light of increasing cyberattacks affecting international financial systems, leaders from major economies gathered to discuss collaborative measures for enhancing cybersecurity. The summit aims to strengthen regulations and share intelligence to protect critical infrastructure and maintain economic stability in an interlinked world.",
+        is_fake=False
+    )
+    print(content_response)
 
 if __name__ == "__main__":
     main()

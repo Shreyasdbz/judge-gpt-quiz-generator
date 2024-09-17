@@ -6,12 +6,9 @@ import os
 import json
 import random
 import openai
-from article import news_outlets_map
-from utils import generate_unique_id
+from models.article import news_outlets_map
+from utils.utils import generate_unique_id
 
-# ------------------------------------------------
-# LLM setup
-# ------------------------------------------------
 
 openai.api_key = os.getenv("JUDGE_GPT_OPENAI_API_KEY")
 # Throw error if API key is not set
@@ -102,6 +99,7 @@ def generate_single_headline(news_outlet, locale, make_fake, used_prompts_list =
                     Don't say "headline" or "context" in the response.
                     Avoid leaving trailing white spaces.
                     Make the context 2-3 sentences long.
+                    Add some nuanced details to the context.
                     Make the topics relevant to the news outlet provided.
                     Pick topics that are usually attention-grabbing and try to avoid mundane ones.
                 '''
@@ -115,7 +113,7 @@ def generate_single_headline(news_outlet, locale, make_fake, used_prompts_list =
             # News outlet to emulate
             {"role": "system", "content": f"Emulate the style of the news outlet: {news_outlet}."},
             # Locale to write in
-            {"role": "system", "content": f"Write the article in {locale} language."},
+            {"role": "system", "content": f"Write the article in {locale} language. Add in some nuanced details."},
             # Avoid repeating prompts
             {"role": "system", "content": f"Don't repeat from these prompts: {used_prompts_list}"},
         ]

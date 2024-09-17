@@ -7,6 +7,7 @@ import json
 import random
 import openai
 from article import news_outlets_map
+from utils import generate_unique_id
 
 # ------------------------------------------------
 # LLM setup
@@ -169,6 +170,7 @@ def generate_multiple_headlines(generate_limit, make_fake_choices, locales_to_us
         )
         current_headlines.append(headline_text)
         fetched_headline_objects.append({
+            "uid": generate_unique_id(),
             "title": headline_text,
             "origin_locale": locale_to_use,
             "style": style_to_use,

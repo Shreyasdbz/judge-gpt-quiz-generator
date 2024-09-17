@@ -47,12 +47,8 @@ def generate_content_with_4o(origin_locale, style, headline, context, is_fake, f
   #### Returns:
   - Generated content: [str]
   """
-  print(
-  f'''
-  Generating content with GPT-4o model.
-  For `{origin_locale}` in `{style}` style. Is fake: `{is_fake}`
-  '''
-  )
+  print(f"Generating content with GPT-4o model. For `{origin_locale}` in `{style}` style. Is fake: `{is_fake}`")
+  locale_name = locale_codes_to_names_map[origin_locale]
   response = openai.chat.completions.create(
     model="gpt-4o",
     messages=[
@@ -69,10 +65,27 @@ def generate_content_with_4o(origin_locale, style, headline, context, is_fake, f
       # Real or fake
       {"role": "user", "content": f"Keep in mind that the story you're writing is {'fake' if is_fake else 'real'}"},
       # Style
-      {"role": "user", "content": f"Write this article in the style of the {locale_codes_to_names_map[origin_locale]} news outlet {style}."},
+      {"role": "user", "content": f"Write this article in the style of the {locale_name} news outlet {style}."},
       # Locale
-      {"role": "user", "content": f"Write this article in {locale_codes_to_names_map[origin_locale]} language."},
+      {"role": "user", "content": f"Write this article in {locale_name} language."},
     ]
   )
   
-  return response.choices[0].message.content
+  content = ""
+  try:
+    content = response.choices[0].message.content
+  except:
+      print(f"Failed to extract content from the response: {response}")
+    
+  print(f"""
+  -----------------------------------
+  ->>> Content generation
+  - Content: 
+  {content}
+  -----------------------------------
+  """
+  )
+  
+  return content
+  
+

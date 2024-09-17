@@ -58,13 +58,9 @@ def translate_using_gpt_35_turbo(text, text_type, source_locale, target_locale, 
     #### Returns
     - str: translated text.
     """
-    print(
-    f'''
-    Translating text from `{source_locale}` to `{target_locale}` using GPT-3.5 model.
-    Emulating news outlet style: `{news_outlet_style}`
-    Text: `{text}`
-    '''
-    )
+    print(f"Translating `{text_type}` from `{source_locale}` to `{target_locale}` using GPT-3.5 model. Emulating news outlet style: `{news_outlet_style}` ")
+    source_locale_name = locale_codes_to_names_map[source_locale]
+    target_locale_name = locale_codes_to_names_map[target_locale]
     response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -78,9 +74,9 @@ def translate_using_gpt_35_turbo(text, text_type, source_locale, target_locale, 
             # Text to translate
             {"role": "user", "content": f"The {text_type} you need to translate is: {text}."},
             # Source locale
-            {"role": "user", "content": f"The original language of the text is: {locale_codes_to_names_map[source_locale]}"},
+            {"role": "user", "content": f"The original language of the text is: {source_locale_name}"},
             # Target locale
-            {"role": "user", "content": f"Translate the text to: {locale_codes_to_names_map[target_locale]}"},
+            {"role": "user", "content": f"Translate the text to: {target_locale_name}"},
             # Style
             {"role": "user", "content": f"When writing the text, try to emulate the style of {news_outlet_style} news outlet."},
             # Misc
@@ -94,5 +90,19 @@ def translate_using_gpt_35_turbo(text, text_type, source_locale, target_locale, 
         ]
     )
     
-    return response.choices[0].message.content
+    content = ""
+    try:
+        content = response.choices[0].message.content
+    except:
+        print(f"Failed to extract content from the response: {response}")
 
+    print(f"""
+    -----------------------------------
+    ->>> Translation
+    - Output: 
+    {content}
+    -----------------------------------
+    """
+    )
+
+    return content

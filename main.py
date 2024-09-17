@@ -16,10 +16,16 @@ from generation.article_generation import generate_and_store_single_article
 def main():
     """ main """
     
-    run_count = 1
+    run_count = 25
     
     # Generate articles
-    for _ in range(run_count):
+    for i in range(run_count):
+        print(f"""
+        ================================================================================
+        ->>> Generating Article {i+1} of {run_count} now...
+        ================================================================================
+        """
+        )
         generate_and_store_single_article()
     
     # Retrieve articles from file and store articles in database

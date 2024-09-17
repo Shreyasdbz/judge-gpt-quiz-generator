@@ -33,12 +33,7 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
     - headline, context, detail
     """
 
-    print(
-    f'''
-    Generating headline with GPT-4o Mini model.
-    For `{news_outlet}` in `{locale}` language. Is fake: `{make_fake}`
-    '''
-    )
+    print("Generating headline with GPT-4o Mini model. For `{news_outlet}` in `{locale}` language. Is fake: `{make_fake}`")
     additional_prompt = ""
     if make_fake:
         additional_prompt = '''Write a fake news article headline. The headline should sound at least fairly realistic.
@@ -84,7 +79,7 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
         "adult content",
     ]
     
-  
+    locale_name = locale_codes_to_names_map[locale]
     response = openai.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -104,6 +99,7 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
                     Add some nuanced details to the context.
                     Make the topics relevant to the news outlet provided.
                     Pick topics that are usually attention-grabbing and try to avoid mundane ones.
+                    Make sure the headline, context and detail and are all included in the response.
                 '''
             },
             # Topics to use
@@ -113,21 +109,36 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
             # Fake or real news conditional prompt
             {"role": "system", "content": additional_prompt},
             # News outlet to emulate
-            {"role": "system", "content": f"Emulate the style of the {locale_codes_to_names_map[locale]} news outlet: {news_outlet}."},
+            {"role": "system", "content": f"Emulate the style of the {locale_name} news outlet: {news_outlet}."},
             # Locale to write in
-            {"role": "system", "content": f"Write the article in {locale_codes_to_names_map[locale]} language. Add in some nuanced details."},
+            {"role": "system", "content": f"Write the article in {locale_name} language. Add in some nuanced details."},
             # Avoid repeating prompts
             {"role": "system", "content": f"Don't repeat from these prompts: {used_prompts_list}"},
+            
         ]
     )
     
     content = response.choices[0].message.content
-    # Extract the headline from the response
-    headline = content.split("\n")[0]
-    # Extract the context from the response
-    context = content.split("\n")[1]
-    # Extract the detail from the response
-    detail = content.split("\n")[2]
+    headline = ""
+    context = ""
+    detail = ""
+    # Try and extract the headline, context and detail from the response
+    try:
+        headline = content.split("\n")[0]
+        context = content.split("\n")[1]
+        detail = content.split("\n")[2]
+    except:
+        print(f"Failed to extract headline, context and detail from the response: {content}")
+        
+        print(f"""
+        -----------------------------------
+        ->>> Headline generation
+        - Headline: {headline}
+        - Context: {context}
+        - Detail: {detail}
+        -----------------------------------
+        """
+        )
 
     return headline, context, detail
      

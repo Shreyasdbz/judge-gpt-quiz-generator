@@ -16,26 +16,17 @@ if openai.api_key is None:
         '''
         )
   
-# ------------------------------------------------------
-# Model options
-# ------------------------------------------------------
-# OpenAI ChatGPT-4o
-# OpenAI ChatGPT-3.5-turbo
-# OpenAI ChatGPT-3.5
-# OpenAI ChatGPT-3
-# Phil-3-medium-4k-instruct
 
 def translate_text(text, source_locale, target_locale, news_outlet_style):
     """
-    Translate text from one language to another.
-    
-    Args:
-        text (str): The text to translate
-        source_locale (str): The original locale of the text
-        target_locale (str): The target locale to translate the text to
-        news_outlet_style (str): The style to emulate of news outlets
-        
-    Returns translated text.
+    ### Translate text from one language to another.
+    #### Args:
+    - text (str): The text to translate
+    - source_locale (str): The original locale of the text
+    - target_locale (str): The target locale to translate the text to
+    - news_outlet_style (str): The style to emulate of news outlets
+    #### Returns
+    - str: translated text.
     """
     print(
     f'''

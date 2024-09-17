@@ -17,19 +17,19 @@ def generate_single_article(
     used_prompts_list: List[str]
 ):
     '''
-    Pipeline for generating a single article. Does not store the generated article.
+    ### Pipeline for generating a single article. Does not store the generated article.
     1. Picks a random locale to use from the passed in options as well as a corresponding
         news outlet style to emulate.
     2. Uses GPT-4o-mini to generate a headline and a context in the locale.
     3. Picks a random content model to use for generating the article.
     4. Generated headline and content are then translated into the rest of the supported locales.
     
-    Args:
+    #### Args:
         locale_choices (list): List of locales to generate articles for
         make_fake_choices (list): [True, False] choices for generating fake articles or not
         content_model_choices (list): List of content models to use for generating the article
         used_prompts_list (list): List of used prompts to avoid repeating headlines
-    Returns:
+    #### Returns:
         Article object
     '''
     print(

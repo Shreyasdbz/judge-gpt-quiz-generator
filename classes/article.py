@@ -12,8 +12,8 @@ from datetime import datetime
 @dataclass
 class Article:
     '''
-    ## Article dataclass to store information about a news article.
-    ### Attributes:
+    ### Article dataclass to store information about a news article.
+    #### Attributes:
     - uid: str - Unique identifier for the article
     - created_at: datetime - Date and time when the article was created
     - title: str - Title of the article

@@ -2,59 +2,49 @@
 This is the article content generation module. It generates news headlines using various different models.
 '''
 
-# ------------------------------------------------------
-# Model options
-# ------------------------------------------------------
-# - GPT-4
-# - GPT-4o
-# - Phi-3-medium-4k-instruct
-# - LlLaMa-2
-# - Meta-Llama-3.1
-# - Mistral-large
-# - Claude-3
-# - Cohere-Command
 
-
-# -----------------
-# Setup
-# -----------------
 
 import os
 import openai
+from utils.locales import locale_codes_to_names_map
 
 openai.api_key = os.getenv("JUDGE_GPT_OPENAI_API_KEY")
 # Throw error if API key is not set
 if openai.api_key is None:
-    raise ValueError(
-    '''
-    [headline_generation] API key is not set. 
-    Please set the OPENAI_API_KEY environment variable.
-    '''
-    )
+  raise ValueError(
+  '''
+  [headline_generation] API key is not set. 
+  Please set the OPENAI_API_KEY environment variable.
+  '''
+  )
 
 
 # Generic prompts for content generation
 primary_prompt = '''
-        You are a journalist writing a short news article that's roughly 50 - 75 words long.
-        Don't say anything that could be considered very offensive or inappropriate.
-        Don't say "content" or "article" in your response.
-        Avoid leaving trailing whitespace at the end of your response.
-        Avoid expressing what could be considered a personal opinion.
-        Avoid repeating the same information in different ways.
-        The output can be multiple lines, but avoid excessively long responses.
+  You are a journalist writing a short news article that's roughly 50 - 75 words long.
+  Don't say anything that could be considered very offensive or inappropriate.
+  Don't say "content" or "article" in your response.
+  Avoid leaving trailing whitespace at the end of your response.
+  Avoid expressing what could be considered a personal opinion.
+  Avoid repeating the same information in different ways.
+  The output can be multiple lines, but avoid excessively long responses.
 '''
 
 
-def generate_content_with_gpt_4o(origin_locale, style, headline, context, is_fake):
+# ---------------------------------------------------
+# Model: ChatGPT-4o
+# ---------------------------------------------------
+def generate_content_with_4o(origin_locale, style, headline, context, is_fake):
   """
-  Generates article content using the GPT-4o model.
-
-  Args:
-      origin_locale (str): The original locale of the article
-      style (str): The style to emulate of news outlets
-      headline (str): Generated headline
-      context (str): Expanded context for the headline
-      is_fake (bool): Flag indicating if the generated headline is fake
+  ### Generates article content using the GPT-4o model.
+  #### Args:
+  - origin_locale (str): The original locale of the article
+  - style (str): The style to emulate of news outlets
+  - headline (str): Generated headline
+  - context (str): Expanded context for the headline
+  - is_fake (bool): Flag indicating if the generated headline is fake
+  #### Returns:
+  - Generated content: [str]
   """
   print(
   f'''
@@ -62,14 +52,13 @@ def generate_content_with_gpt_4o(origin_locale, style, headline, context, is_fak
   For `{origin_locale}` in `{style}` style. Is fake: `{is_fake}`
   '''
   )
-  
   response = openai.chat.completions.create(
     model="gpt-4o",
     messages=[
       # Primary prompt
       {"role": "system", "content": 
-        f'''{primary_prompt}
-        '''
+      f'''{primary_prompt}
+      '''
       },
       # Headline & context
       {"role": "user", "content": f"The article you'll be writing about is headlined: {headline}."},
@@ -79,7 +68,7 @@ def generate_content_with_gpt_4o(origin_locale, style, headline, context, is_fak
       # Style
       {"role": "user", "content": f"Write this article in the style of {style} news outlet."},
       # Locale
-      {"role": "user", "content": f"Write this article in {origin_locale} language."},
+      {"role": "user", "content": f"Write this article in {locale_codes_to_names_map[origin_locale]} language."},
     ]
   )
   

@@ -8,45 +8,48 @@ respective LLMs. These include GPT-4, GPT-4o, Phi-3-medium-4k-instruct, Llama-2,
 Meta-Llama-3.1, Mistral-large, etc.
 '''
 
-from models.article import supported_locales
-from generation.headline_generation import generate_multiple_headlines
-from generation.content_generation import generate_content_with_gpt_4o
+import json
+from typing import List
+from classes.article import Article
+from utils.locales import supported_locales
+from generation.article_generation import generate_single_article
 
 
-# def initialize():
-#     """ Initialize the application """
-#     print("Initializing application...")
-
-# def process_data():
-#     """ Process the data """
-#     print("Processing data...")
-
-# def cleanup():
-#     """ Clean up the application """
-#     print("Cleaning up...")
 
 def main():
     """ main """
     
-    generated_headlines_file_path = "data/generated_headlines.json"
+    generated_articles_file_path = "data/generated_articles.json"
     
-    # Step 1: Headline generation
-    # generate_multiple_headlines(
-    #     generate_limit=10,
-    #     make_fake_choices=[True, False],
-    #     locales_to_use=supported_locales,
-    #     generated_headlines_file_path=generated_headlines_file_path
-    # )    
+    fetched_articles = []
+    current_headlines:List[str] = []
+    articles_to_add:List[Article] = []
     
-    # Step 2: Content generation
-    content_response = generate_content_with_gpt_4o(
-        origin_locale="en",
-        style="Financial Times",
-        headline="Major Economies Unite to Combat Cybersecurity Threats in Digital Age",
-        context="In light of increasing cyberattacks affecting international financial systems, leaders from major economies gathered to discuss collaborative measures for enhancing cybersecurity. The summit aims to strengthen regulations and share intelligence to protect critical infrastructure and maintain economic stability in an interlinked world.",
-        is_fake=False
+    # Read in previously generated headlines
+    with open (generated_articles_file_path, 'r') as read_file:
+        data = json.load(read_file)
+        fetched_articles = data["articles"]
+        print(f"Retrieved {len(fetched_articles)} articles from file.")
+        if(len(fetched_articles) > 0):
+            for i in range(len(fetched_articles)):
+                current_headlines.append(fetched_articles[i]["title"])
+        read_file.close()
+        
+    # Generate a single article
+    new_article = generate_single_article(
+        locale_choices=supported_locales,
+        make_fake_choices=[True, False],
+        content_model_choices=["GPT-4o"],
+        used_prompts_list=current_headlines
     )
-    print(content_response)
+    articles_to_add.append(new_article)
+    
+    # Write out to file
+    with open(generated_articles_file_path, 'w') as write_file:
+        for article in articles_to_add:
+            fetched_articles.append(article.to_dict())
+        json.dump({"articles": fetched_articles}, write_file, indent=4)
+    
 
 if __name__ == "__main__":
     main()

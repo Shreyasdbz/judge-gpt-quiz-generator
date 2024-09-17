@@ -3,33 +3,35 @@ This is the headline generation module. It generates news headlines using the GP
 '''
 
 import os
-import json
-import random
 import openai
-from models.article import news_outlets_map
-from utils.utils import generate_unique_id
+from utils.locales import news_outlets_map, locale_codes_to_names_map
+from utils.misc import generate_unique_id
 
 
 openai.api_key = os.getenv("JUDGE_GPT_OPENAI_API_KEY")
 # Throw error if API key is not set
 if openai.api_key is None:
     raise ValueError(
-        '''
-        [headline_generation] API key is not set. 
-        Please set the OPENAI_API_KEY environment variable.
-        '''
-        )
+    '''
+    [headline_generation] API key is not set. 
+    Please set the OPENAI_API_KEY environment variable.
+    '''
+    )
 
-def generate_single_headline(news_outlet, locale, make_fake, used_prompts_list = []):
+
+# ---------------------------------------------------
+# Model: ChatGPT-4o-Mini
+# ---------------------------------------------------
+def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_list = []):
     """ 
-    Generate a news headline using the GPT-4o Mini model.
-    Args:
-        news_outlet (str): The news outlet to emulate
-        locale (str): The locale to write the headline in
-        make_fake (bool): Flag indicating if the headline should be fake
-        used_prompts_list (list): List of prompts to avoid repeating
-    Returns:
-        Tuple: Headline and context
+    ### Generate a news headline using the GPT-4o Mini model.
+    #### Args:
+    - news_outlet (str): The news outlet to emulate
+    - locale (str): The locale to write the headline in
+    - make_fake (bool): Flag indicating if the headline should be fake
+    - used_prompts_list (list): List of prompts to avoid repeating
+    #### Returns:
+    - Tuple: [Headline, Context]
     """
 
     print(
@@ -73,7 +75,6 @@ def generate_single_headline(news_outlet, locale, make_fake, used_prompts_list =
         "international society",
         "international history",
     ]
-    
     topics_to_avoid = [
         "local",
         "regional",
@@ -81,7 +82,6 @@ def generate_single_headline(news_outlet, locale, make_fake, used_prompts_list =
         "not safe for work",
         "adult content",
     ]
-    
     
   
     response = openai.chat.completions.create(
@@ -113,7 +113,7 @@ def generate_single_headline(news_outlet, locale, make_fake, used_prompts_list =
             # News outlet to emulate
             {"role": "system", "content": f"Emulate the style of the news outlet: {news_outlet}."},
             # Locale to write in
-            {"role": "system", "content": f"Write the article in {locale} language. Add in some nuanced details."},
+            {"role": "system", "content": f"Write the article in {locale_codes_to_names_map[locale]} language. Add in some nuanced details."},
             # Avoid repeating prompts
             {"role": "system", "content": f"Don't repeat from these prompts: {used_prompts_list}"},
         ]
@@ -127,65 +127,6 @@ def generate_single_headline(news_outlet, locale, make_fake, used_prompts_list =
 
     # Tuple of headline and context
     return headline, context
-
-
-def generate_multiple_headlines(generate_limit, make_fake_choices, locales_to_use, generated_headlines_file_path):
-    """
-    Generate multiple news headlines using the GPT-4o Mini model.
-    Args:
-        generate_limit (num): Limit of headlines to generate
-        make_fake_choices (list<bool>): Type of headlines to generate [True, False]
-        locales_to_use (list): List of locales to generate headlines for
-        generated_headlines_file_path (str): Path to the file to store / retrieve the generated headlines
-    """
-
-    fetched_headline_objects = []
-    current_headlines = []
-    
-    # Open json file to retrieve generated headlines
-    with open (generated_headlines_file_path, 'r') as read_file:
-        data = json.load(read_file)
-        fetched_headline_objects = data["headlines"]
-        print(f"Retrieved {len(fetched_headline_objects)} headlines from file.")
-        for headline in fetched_headline_objects:
-            current_headlines.append(headline["title"])
-        read_file.close()
-    
-    # Loop through the generate_limit
-    for i in range(generate_limit):
-
-        # Params for each headline
-        locale_to_use = random.choice(locales_to_use)
-        style_to_use = random.choice(news_outlets_map[locale_to_use])
-        make_fake = random.choice(make_fake_choices)
-
-        # Generate a headline
-        headline_text, context_text = generate_single_headline(
-            news_outlet=style_to_use,
-            locale=locale_to_use,
-            make_fake=make_fake,
-            used_prompts_list=current_headlines
-        )
-        current_headlines.append(headline_text)
-        fetched_headline_objects.append({
-            "uid": generate_unique_id(),
-            "title": headline_text,
-            "origin_locale": locale_to_use,
-            "style": style_to_use,
-            "is_fake": make_fake,
-            "headline_generation_model_used": "GPT-4o Mini",
-            "headline_context": context_text,
-        })
-    
-    # Write the generated headlines to the json file
-    with open(generated_headlines_file_path, 'w') as write_file:
-        json.dump({"headlines": fetched_headline_objects}, write_file)
-        write_file.close()
-        print(
-            f"""{generate_limit} headlines generated and stored in file."""
-            )
-        
-
 
      
     

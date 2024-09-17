@@ -3,8 +3,6 @@ This is the translations module. It is used to translate text between different 
 '''
 
 import os
-import json
-import random
 import openai
 
 

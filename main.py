@@ -9,47 +9,36 @@ Meta-Llama-3.1, Mistral-large, etc.
 '''
 
 import json
-from typing import List
-from classes.article import Article
-from utils.locales import supported_locales
-from generation.article_generation import generate_single_article
-
+from utils.database import store_articles_to_db
+from generation.article_generation import generate_and_store_single_article
 
 
 def main():
     """ main """
     
+    run_count = 1
+    
+    # Generate articles
+    for _ in range(run_count):
+        generate_and_store_single_article()
+    
+    # Retrieve articles from file and store articles in database
     generated_articles_file_path = "data/generated_articles.json"
-    
-    fetched_articles = []
-    current_headlines:List[str] = []
-    articles_to_add:List[Article] = []
-    
-    # Read in previously generated headlines
     with open (generated_articles_file_path, 'r') as read_file:
         data = json.load(read_file)
-        fetched_articles = data["articles"]
-        print(f"Retrieved {len(fetched_articles)} articles from file.")
-        if(len(fetched_articles) > 0):
-            for i in range(len(fetched_articles)):
-                current_headlines.append(fetched_articles[i]["title"])
+        articles = data["articles"]
+        print(f"Retrieved {len(articles)} articles from file.")
         read_file.close()
-        
-    # Generate a single article
-    new_article = generate_single_article(
-        locale_choices=supported_locales,
-        make_fake_choices=[True, False],
-        content_model_choices=["GPT-4o"],
-        used_prompts_list=current_headlines
-    )
-    articles_to_add.append(new_article)
+    # Store in database
+    db_result = store_articles_to_db("testing", articles)
+    if db_result:
+        print(f"Stored {len(articles)} articles in database.")
     
-    # Write out to file
+    # Empty the array in the file
     with open(generated_articles_file_path, 'w') as write_file:
-        for article in articles_to_add:
-            fetched_articles.append(article.to_dict())
-        json.dump({"articles": fetched_articles}, write_file, indent=4)
+        json.dump({"articles": []}, write_file)
+        write_file.close()
+    print(f"Emptied {generated_articles_file_path} file.")
     
-
 if __name__ == "__main__":
     main()

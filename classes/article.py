@@ -16,46 +16,52 @@ class Article:
     #### Attributes:
     - uid: str - Unique identifier for the article
     - created_at: datetime - Date and time when the article was created
-    - title: str - Title of the article
+    - headline: str - headline of the article
     - content: str - Content of the article
     - is_fake: bool - Flag indicating if the article is fake
-    - fake_details: str - Specific details about the article that make it fake
+    - details: str - Specific details about the article that make it fake
     - style_or_source: str - Style (if generated) or source (if real) of the article
     - origin_locale: str - Locale of the original article
-    - headline_generation_model_used: str - Model used for headline generation
-    - headline_translation_model_used: str - Model used for headline translation
     - headline_context: str - Context for the headline that's generated which can be used to generate the content
+    - headline_model_used: str - Model used for headline generation
     - content_model_used: str - Model used for content generation
-    - content_translation_model_used: str - Model used for content translation
-    - localized_title_en: str - Localized title in English
+    - translation_model_used: str - Model used for content translation
+    - localized_headline_en: str - Localized headline in English
+    - localized_detail_en: str - Localized detail in English
     - localized_content_en: str - Localized content in English
-    - localized_title_es: str - Localized title in Spanish
+    - localized_headline_es: str - Localized headline in Spanish
+    - localized_detail_es: str - Localized detail in Spanish
     - localized_content_es: str - Localized content in Spanish
-    - localized_title_fr: str - Localized title in French
+    - localized_headline_fr: str - Localized headline in French
+    - localized_detail_fr: str - Localized detail in French
     - localized_content_fr: str - Localized content in French
-    - localized_title_de: str - Localized title in German
+    - localized_headline_de: str - Localized headline in German
+    - localized_detail_de: str - Localized detail in German
     - localized_content_de: str - Localized content in German
     '''
     uid: str = field(default_factory=lambda: ''.join(random.choices(string.ascii_letters + string.digits, k=10)))
     created_at: datetime = field(default_factory=datetime.now)
-    title: str = ""
+    headline: str = ""
     content: str = ""
     is_fake: bool = False
-    fake_details: str = ""
+    headline_context: str = ""
+    details: str = ""
     style_or_source: str = ""
     origin_locale: str = ""
-    headline_generation_model_used: str = ""
-    headline_translation_model_used: str = ""
-    headline_context: str = ""
+    headline_model_used: str = ""
     content_model_used: str = ""
-    content_translation_model_used: str = ""
-    localized_title_en: str = ""
+    translation_model_used: str = ""
+    localized_headline_en: str = ""
+    localized_detail_en: str = ""
     localized_content_en: str = ""
-    localized_title_es: str = ""
+    localized_headline_es: str = ""
+    localized_detail_es: str = ""
     localized_content_es: str = ""
-    localized_title_fr: str = ""
+    localized_headline_fr: str = ""
+    localized_detail_fr: str = ""
     localized_content_fr: str = ""
-    localized_title_de: str = ""
+    localized_headline_de: str = ""
+    localized_detail_de: str = ""
     localized_content_de: str = ""
     
     def to_dict(self):

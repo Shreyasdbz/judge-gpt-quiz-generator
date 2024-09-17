@@ -99,8 +99,8 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
                     Don't include the headline in the context or detail.
                     Don't say "headline" or "context" or "detail" in the response.
                     Avoid leaving trailing white spaces.
-                    Make the context 2-3 sentences long.
-                    Make the detail 1 sentence long. It should be a nuanced detail.
+                    Make the context 1-2 short sentences long.
+                    Make the detail 1 short sentence. It should be a nuanced detail.
                     Add some nuanced details to the context.
                     Make the topics relevant to the news outlet provided.
                     Pick topics that are usually attention-grabbing and try to avoid mundane ones.

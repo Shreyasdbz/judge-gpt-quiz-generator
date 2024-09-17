@@ -9,14 +9,12 @@ Meta-Llama-3.1, Mistral-large, etc.
 '''
 
 import json
-from utils.database import store_articles_to_db
+from utils.database import store_articles_to_db 
 from generation.article_generation import generate_and_store_single_article
 
 
-def main():
-    """ main """
-    
-    run_count = 25
+def generate_and_push_to_db():
+    run_count = 5
     
     # Generate articles
     for i in range(run_count):
@@ -44,7 +42,21 @@ def main():
     with open(generated_articles_file_path, 'w') as write_file:
         json.dump({"articles": []}, write_file)
         write_file.close()
-    print(f"Emptied {generated_articles_file_path} file.")
+    print(f"Emptied {generated_articles_file_path} file.")    
+
+
+
+def main():
+    """ main """
+    
+    print(
+    """
+    ================================================================================
+    ->>> Welcome to the News Article Generation App!
+    - Add in a function call below to get started.
+    ================================================================================
+    """
+    )        
     
 if __name__ == "__main__":
     main()

@@ -148,12 +148,22 @@ def generate_and_store_single_article():
     #### Generates a single article and stores it in the generated_articles.json file.
     '''
     generated_articles_file_path = "data/generated_articles.json"
+    generated_headlines_file_path = "data/generated_headlines.json"
     
     fetched_articles = []
     current_headlines:List[str] = []
     articles_to_add:List[Article] = []
     
-    # Read in previously generated headlines
+    # Read in previously generated headlines via DB fetched headlines
+    with open (generated_headlines_file_path, 'r') as read_file:
+        data = json.load(read_file)
+        fetched_headlines = data["headlines"]
+        print(f"Retrieved {len(fetched_headlines)} headlines from file.")
+        for i in range(len(fetched_headlines)):
+            current_headlines.append(fetched_headlines[i])
+        read_file.close()
+    
+    # Read in previously generated headlines via fresh articles 
     with open (generated_articles_file_path, 'r') as read_file:
         data = json.load(read_file)
         fetched_articles = data["articles"]
@@ -171,6 +181,12 @@ def generate_and_store_single_article():
         used_prompts_list=current_headlines
     )
     articles_to_add.append(new_article)
+    
+    # Update generated_headlines.json file with the new headline
+    headline_to_add = new_article.localized_headline_en
+    with open(generated_headlines_file_path, 'w') as write_file:
+        fetched_headlines.append(headline_to_add)
+        json.dump({"headlines": fetched_headlines}, write_file, indent=4)
     
     # Write out to file
     with open(generated_articles_file_path, 'w') as write_file:

@@ -21,6 +21,13 @@ news_outlets_en = [
   "Financial Times",
   "The Economist",
   "Bloomberg",
+  "Reuters",
+  "Associated Press",
+  "CNN",
+  "BBC News",
+  "Fox News",
+  "MSNBC",
+  "NPR",
 ]
 news_outlets_es = [
   "El País",
@@ -31,6 +38,10 @@ news_outlets_es = [
   "La Razón",
   "El Español",
   "Público",
+  "20 Minutos",
+  "EFE",
+  "Europa Press",
+  "RTVE",
 ]
 news_outlets_fr = [
   "Le Monde",
@@ -41,6 +52,9 @@ news_outlets_fr = [
   "Le Parisien",
   "La Croix",
   "Marianne",
+  "France 24",
+  "Agence France-Presse (AFP)",
+  "BFMTV",
 ]
 news_outlets_de = [
   "Bild",
@@ -51,6 +65,8 @@ news_outlets_de = [
   "Die Zeit",
   "Handelsblatt",
   "Focus",
+  "Tagesschau",
+  "Deutsche Welle",
 ]
 news_outlets_map = {
   'en': news_outlets_en,

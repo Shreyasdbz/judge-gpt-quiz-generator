@@ -69,7 +69,7 @@ def generate_content_with_4o(origin_locale, style, headline, context, is_fake, f
       # Real or fake
       {"role": "user", "content": f"Keep in mind that the story you're writing is {'fake' if is_fake else 'real'}"},
       # Style
-      {"role": "user", "content": f"Write this article in the style of {style} news outlet."},
+      {"role": "user", "content": f"Write this article in the style of the {locale_codes_to_names_map[origin_locale]} news outlet {style}."},
       # Locale
       {"role": "user", "content": f"Write this article in {locale_codes_to_names_map[origin_locale]} language."},
     ]

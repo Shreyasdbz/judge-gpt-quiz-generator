@@ -113,7 +113,7 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
             # Fake or real news conditional prompt
             {"role": "system", "content": additional_prompt},
             # News outlet to emulate
-            {"role": "system", "content": f"Emulate the style of the news outlet: {news_outlet}."},
+            {"role": "system", "content": f"Emulate the style of the {locale_codes_to_names_map[locale]} news outlet: {news_outlet}."},
             # Locale to write in
             {"role": "system", "content": f"Write the article in {locale_codes_to_names_map[locale]} language. Add in some nuanced details."},
             # Avoid repeating prompts

@@ -1,4 +1,3 @@
-
 import random
 import json
 from datetime import datetime
@@ -7,29 +6,31 @@ from typing import List
 from classes.article import Article
 from utils.locales import news_outlets_map, supported_locales
 from utils.misc import generate_unique_id
-from generation.content_generation import generate_content_with_4o
-from generation.headline_generation import generate_headline_with_4o_mini
-from generation.translations import translate_text
+from generation import content_generation
+from generation import headline_generation
+from generation import translations
+
+ARTICLES_FILE_PATH = "data/generated_articles.json"
+HEADLINE_FILE_PATH = "data/generated_headlines.json"
 
 
 def generate_single_article(
     locale_choices: List[str],
     make_fake_choices: List[bool],
-    content_model_choices: List[str],
-    used_prompts_list: List[str]
-):
+    used_prompts_list: List[str],
+    model: str
+    ):
     '''
     ### Pipeline for generating a single article. Does not store the generated article.
     1. Picks a random locale to use from the passed in options as well as a corresponding
         news outlet style to emulate.
-    2. Uses GPT-4o-mini to generate a headline and a detail in the locale.
+    2. Uses {model} to generate a headline and a detail in the locale.
     3. Picks a random content model to use for generating the article.
     4. Generated headline and content are then translated into the rest of the supported locales.
     
     #### Args:
         locale_choices (list): List of locales to generate articles for
         make_fake_choices (list): [True, False] choices for generating fake articles or not
-        content_model_choices (list): List of content models to use for generating the article
         used_prompts_list (list): List of used prompts to avoid repeating headlines
     #### Returns:
         Article object
@@ -37,10 +38,9 @@ def generate_single_article(
     print(
         f'''
         Generating article.
-        Headline model: GPT-4o-mini
+        Headline model: {model}
         Locales: {locale_choices}
         Fake: {make_fake_choices}
-        Content models: {content_model_choices}
         '''
     )    
     new_article: Article = Article()
@@ -50,11 +50,12 @@ def generate_single_article(
     make_fake = random.choice(make_fake_choices)
     
     # Generate article headline
-    headline, detail = generate_headline_with_4o_mini(
+    headline, detail = headline_generation.generate_headline(
         news_outlet=style_to_use,
         locale=locale_to_use,
         make_fake=make_fake,
-        used_prompts_list=used_prompts_list
+        used_prompts_list=used_prompts_list,
+        model=model
     )
     new_article.uid = generate_unique_id()
     new_article.created_at = datetime.now().isoformat()
@@ -63,23 +64,24 @@ def generate_single_article(
     new_article.is_fake = make_fake
     new_article.detail = detail
     new_article.headline = headline
-    new_article.headline_model_used = "GPT-4o-mini"
+    new_article.headline_model_used = model
     
     # Generate article content
     # -- TODO: Based on the content model choice, pick the appropriate model
-    content = generate_content_with_4o(
+    content = content_generation.generate_content(
         origin_locale=locale_to_use,
         style=style_to_use,
         headline=headline,
         detail=detail,
         is_fake=make_fake,
-        fake_detail=detail
+        fake_detail=detail,
+        model=model
     )
     new_article.content = content
-    new_article.content_model_used = "GPT-4o"
+    new_article.content_model_used = model
     
     # Translate headline and content into the rest of the supported locales
-    new_article.translation_model_used = "GPT-3.5-turbo"
+    new_article.translation_model_used = model
     # First, fill out the current locale's translations
     if locale_to_use == "en":
         new_article.localized_headline_en = headline
@@ -100,26 +102,29 @@ def generate_single_article(
     # Now, the rest  
     languages_to_translate_into = [lang for lang in locale_choices if lang != locale_to_use]
     for lang in languages_to_translate_into:
-        translated_headline = translate_text(
+        translated_headline = translations.translate(
             text=headline, 
             text_type="headline", 
             source_locale=locale_to_use, 
             target_locale=lang, 
-            news_outlet_style=style_to_use
+            news_outlet_style=style_to_use,
+            model=model
         )
-        translated_detail = translate_text(
+        translated_detail = translations.translate(
             text=detail, 
             text_type="detail", 
             source_locale=locale_to_use, 
             target_locale=lang, 
-            news_outlet_style=style_to_use
+            news_outlet_style=style_to_use,
+            model=model
         )
-        translated_content = translate_text(
+        translated_content = translations.translate(
             text=content, 
             text_type="content", 
             source_locale=locale_to_use, 
             target_locale=lang, 
-            news_outlet_style=style_to_use
+            news_outlet_style=style_to_use,
+            model=model
         )
         if lang == "en":
             new_article.localized_headline_en = translated_headline
@@ -142,19 +147,17 @@ def generate_single_article(
     return new_article
 
 
-def generate_and_store_single_article():
+def generate_and_store_single_article(model):
     '''
     #### Generates a single article and stores it in the generated_articles.json file.
     '''
-    generated_articles_file_path = "data/generated_articles.json"
-    generated_headlines_file_path = "data/generated_headlines.json"
     
     fetched_articles = []
     current_headlines:List[str] = []
     articles_to_add:List[Article] = []
     
     # Read in previously generated headlines via DB fetched headlines
-    with open (generated_headlines_file_path, 'r') as read_file:
+    with open (HEADLINE_FILE_PATH, 'r') as read_file:
         data = json.load(read_file)
         fetched_headlines = data["headlines"]
         print(f"Retrieved {len(fetched_headlines)} headlines from file.")
@@ -163,7 +166,7 @@ def generate_and_store_single_article():
         read_file.close()
     
     # Read in previously generated headlines via fresh articles 
-    with open (generated_articles_file_path, 'r') as read_file:
+    with open (ARTICLES_FILE_PATH, 'r') as read_file:
         data = json.load(read_file)
         fetched_articles = data["articles"]
         print(f"Retrieved {len(fetched_articles)} articles from file.")
@@ -176,19 +179,19 @@ def generate_and_store_single_article():
     new_article = generate_single_article(
         locale_choices=supported_locales,
         make_fake_choices=[True, False],
-        content_model_choices=["GPT-4o"],
-        used_prompts_list=current_headlines
+        used_prompts_list=current_headlines,
+        model=model
     )
     articles_to_add.append(new_article)
     
     # Update generated_headlines.json file with the new headline
     headline_to_add = new_article.localized_headline_en
-    with open(generated_headlines_file_path, 'w') as write_file:
+    with open(HEADLINE_FILE_PATH, 'w') as write_file:
         fetched_headlines.append(headline_to_add)
         json.dump({"headlines": fetched_headlines}, write_file, indent=4)
     
     # Write out to file
-    with open(generated_articles_file_path, 'w') as write_file:
+    with open(ARTICLES_FILE_PATH, 'w') as write_file:
         for article in articles_to_add:
             fetched_articles.append(article.to_dict())
         json.dump({"articles": fetched_articles}, write_file, indent=4)    

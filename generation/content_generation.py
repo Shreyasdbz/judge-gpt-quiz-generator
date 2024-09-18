@@ -2,21 +2,10 @@
 This is the article content generation module. It generates news headlines using various different models.
 '''
 
-
-
-import os
-import openai
 from utils.locales import locale_codes_to_names_map
+import azure_client
 
-openai.api_key = os.getenv("JUDGE_GPT_OPENAI_API_KEY")
-# Throw error if API key is not set
-if openai.api_key is None:
-  raise ValueError(
-  '''
-  [headline_generation] API key is not set. 
-  Please set the OPENAI_API_KEY environment variable.
-  '''
-  )
+_client = azure_client.get_client()
 
 
 # Generic prompts for content generation
@@ -31,12 +20,9 @@ primary_prompt = '''
 '''
 
 
-# ---------------------------------------------------
-# Model: ChatGPT-4o
-# ---------------------------------------------------
-def generate_content_with_4o(origin_locale, style, headline, detail, is_fake, fake_detail):
+def generate_content(origin_locale, style, headline, detail, is_fake, fake_detail, model):
   """
-  ### Generates article content using the GPT-4o model.
+  ### Generates article content using the specified model.
   #### Args:
   - origin_locale (str): The original locale of the article
   - style (str): The style to emulate of news outlets
@@ -44,13 +30,14 @@ def generate_content_with_4o(origin_locale, style, headline, detail, is_fake, fa
   - detail (str): Some detail for the headline
   - is_fake (bool): Flag indicating if the generated headline is fake
   - fake_detail (str): Detail about what makes the headline fake / real
+  - model (str): The model to use for generating the content
   #### Returns:
   - Generated content: [str]
   """
-  print(f"Generating content with GPT-4o model. For `{origin_locale}` in `{style}` style. Is fake: `{is_fake}`")
+  print(f"Generating content with {model} model. For `{origin_locale}` in `{style}` style. Is fake: `{is_fake}`")
   locale_name = locale_codes_to_names_map[origin_locale]
-  response = openai.chat.completions.create(
-    model="gpt-4o",
+  response = _client.complete(
+    model=model,
     messages=[
       # Primary prompt
       {"role": "system", "content": 

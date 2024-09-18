@@ -1,39 +1,27 @@
 '''
-This is the headline generation module. It generates news headlines using the GPT-4o Mini model.
+This is the headline generation module. It generates news headlines using the specified model.
 '''
 
-import os
-import openai
 from utils.locales import locale_codes_to_names_map
 
+import azure_client
 
-openai.api_key = os.getenv("JUDGE_GPT_OPENAI_API_KEY")
-# Throw error if API key is not set
-if openai.api_key is None:
-    raise ValueError(
-    '''
-    [headline_generation] API key is not set. 
-    Please set the OPENAI_API_KEY environment variable.
-    '''
-    )
+_client = azure_client.get_client()
 
-
-# ---------------------------------------------------
-# Model: ChatGPT-4o-Mini
-# ---------------------------------------------------
-def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_list = []):
+def generate_headline(news_outlet, locale, make_fake, used_prompts_list, model):
     """ 
-    ### Generate a news headline using the GPT-4o Mini model.
+    ### Generate a news headline using the specified model.
     #### Args:
     - news_outlet (str): The news outlet to emulate
     - locale (str): The locale to write the headline in
     - make_fake (bool): Flag indicating if the headline should be fake
     - used_prompts_list (list): List of prompts to avoid repeating
+    - model (str): The model to use for generating the headline
     #### Returns:
     - headline, detail
     """
 
-    print("Generating headline with GPT-4o Mini model. For `{news_outlet}` in `{locale}` language. Is fake: `{make_fake}`")
+    print(f"Generating headline with {model} model. For `{news_outlet}` in `{locale}` language. Is fake: `{make_fake}`")
     additional_prompt = ""
     if make_fake:
         additional_prompt = '''Write a fake news article headline. The headline should sound at least fairly realistic.
@@ -42,7 +30,7 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
     else:
         additional_prompt = "Write a real news article headline."            
 
-    topicss_to_use = [
+    topics_to_use = [
         "recent events",
         "international politics",
         "international sports",
@@ -80,8 +68,12 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
     ]
     
     locale_name = locale_codes_to_names_map[locale]
-    response = openai.chat.completions.create(
-        model="gpt-4o-mini",
+
+    
+
+
+    response = _client.complete(
+        model=model,
         messages=[
             # Primary prompt
             {"role": "system", "content": 
@@ -100,7 +92,7 @@ def generate_headline_with_4o_mini(news_outlet, locale, make_fake, used_prompts_
                 '''
             },
             # Topics to use
-            {"role": "system", "content": f"Topics to use: {topicss_to_use}"},
+            {"role": "system", "content": f"Topics to use: {topics_to_use}"},
             # Topics to avoid
             {"role": "system", "content": f"Topics to avoid: {topics_to_avoid}"},
             # Fake or real news conditional prompt

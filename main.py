@@ -13,8 +13,8 @@ from utils.database import store_articles_to_db
 from generation.article_generation import generate_and_store_single_article
 
 
-def generate_and_push_to_db():
-    run_count = 5
+def generate_and_push_to_db(db_name="testing"):
+    run_count = 1
     
     # Generate articles
     for i in range(run_count):
@@ -34,7 +34,7 @@ def generate_and_push_to_db():
         print(f"Retrieved {len(articles)} articles from file.")
         read_file.close()
     # Store in database
-    db_result = store_articles_to_db("testing", articles)
+    db_result = store_articles_to_db(db_name, articles)
     if db_result:
         print(f"Stored {len(articles)} articles in database.")
     
@@ -58,7 +58,7 @@ def main():
     """
     )  
     
-    generate_and_push_to_db()      
+    # generate_and_push_to_db(db_name="dev")      
     
 if __name__ == "__main__":
     main()
